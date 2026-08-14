@@ -9,14 +9,25 @@ public class GridMonitor implements GridMonitorInterface
     public GridMonitor(String filename) throws FileNotFoundException
     {
         Scanner s = new Scanner(new File(filename));
-
+        String[] dimStr = s.nextLine().split("\\s");
+        int dimX = Integer.parseInt(dimStr[0]);
+        int dimY = Integer.parseInt(dimStr[1]);
+        grid = new double[dimX][dimY];
+        int j = 0;
+        while (s.hasNextLine()) {
+            String[] row = s.nextLine().split("\\s");
+            for ( int i = 0; i < dimY; i++ ) {
+                int bingo = Integer.parseInt(row[i]);
+                grid[j][i] = bingo;
+            }
+        j++;
+        }
         s.close();
     }
 
     @Override
     public double[][] getBaseGrid() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSurroundingSumGrid'");
+        return grid;
     }
 
     @Override
