@@ -5,8 +5,8 @@ import java.io.File;
 public class GridMonitor implements GridMonitorInterface
 {
     private double[][] grid;
-    int dimX;
-    int dimY;
+    public int dimX;
+    public int dimY;
 
     public GridMonitor(String filename) throws FileNotFoundException
     {
@@ -38,12 +38,6 @@ public class GridMonitor implements GridMonitorInterface
         double[][] surroundingSumGrid;
         surroundingSumGrid = new double[dimX][dimY];
         grid = getBaseGrid();
-
-        // for (int i = 0; i < dimX; i++){
-        //     for (int j = 0; j < dimY; j++){
-        //         System.out.println(grid[i][j]);
-        //     }
-        // }
 
         for (int i = 0; i < dimX; i++){
             for (int j = 0; j < dimY; j++){
@@ -121,8 +115,36 @@ public class GridMonitor implements GridMonitorInterface
 
     @Override
     public boolean[][] getDangerGrid() {
-      Boolean[][] DangerGrid;
-      DangerGrid = new double[DimX][DimY];
+        boolean[][] DangerGrid;
+        DangerGrid = new boolean[dimX][dimY];
+
+        grid = getBaseGrid();
+        double[][] deltaGrid = getDeltaGrid();
+        double[][] avggrid = getSurroundingAvgGrid();
+
+
+        for (int i = 0; i < dimX; i++){
+            for (int j = 0; j < dimY; j++){
+                double num;
+                double delta;
+                double avg;
+
+                num = grid[i][j];
+                delta = deltaGrid[i][j];
+                avg = avggrid[i][j];
+
+                if (((avg + delta) >= num) || ((avg - delta) <= num)) {
+                    DangerGrid[i][j] = false;
+                } else {
+                    DangerGrid[i][j] = true;
+                };
+
+            }
+        }
+    
+
+
+      return DangerGrid;
 
     }
     
