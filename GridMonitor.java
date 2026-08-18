@@ -30,122 +30,105 @@ public class GridMonitor implements GridMonitorInterface
 
     @Override
     public double[][] getBaseGrid() {
-        return grid;
-    }
 
-    @Override
-    public double[][] getSurroundingSumGrid() {
-        double[][] surroundingSumGrid;
-        surroundingSumGrid = new double[dimX][dimY];
-        grid = getBaseGrid();
+        double[][] gridCopy;
+        gridCopy = new double[dimX][dimY];
 
         for (int i = 0; i < dimX; i++){
             for (int j = 0; j < dimY; j++){
-                if (i + 1 < dimX) {
-                    surroundingSumGrid[i][j] += (grid[i + 1][j]);
-                } else {
-                    surroundingSumGrid[i][j] += grid[i][j];
-                }
+                gridCopy[i][j] = grid[i][j];
+            }
+        }
+        return gridCopy;
+    }
 
-                if (j + 1 < dimY) {
-                    surroundingSumGrid[i][j] += (grid[i][j + 1]);
-                } else {
-                    surroundingSumGrid[i][j] += grid[i][j];}; 
+ @Override
+    public double[][] getSurroundingSumGrid() {
+        double[][] base = getBaseGrid();  
+        double[][] surroundingSumGrid = new double[dimX][dimY];
 
-                if (i - 1 >= 0) {
-                    surroundingSumGrid[i][j] += (grid[i - 1][j]);
-                } else {
-                    surroundingSumGrid[i][j] += grid[i][j];};
+        for (int i = 0; i < dimX; i++){
+            for (int j = 0; j < dimY; j++){
+                if (i + 1 < dimX) surroundingSumGrid[i][j] += base[i + 1][j];
+                else surroundingSumGrid[i][j] += base[i][j];
 
-                if (j - 1 >= 0) {
-                    surroundingSumGrid[i][j] += (grid[i][j - 1]);
-                } else {
-                    surroundingSumGrid[i][j] += grid[i][j];};
+                if (j + 1 < dimY) surroundingSumGrid[i][j] += base[i][j + 1];
+                else surroundingSumGrid[i][j] += base[i][j];
+
+                if (i - 1 >= 0) surroundingSumGrid[i][j] += base[i - 1][j];
+                else surroundingSumGrid[i][j] += base[i][j];
+
+                if (j - 1 >= 0) surroundingSumGrid[i][j] += base[i][j - 1];
+                else surroundingSumGrid[i][j] += base[i][j];
             }
         }
         return surroundingSumGrid;
     }
 
-    @Override 
+    @Override
     public double[][] getSurroundingAvgGrid() {
-
-        double[][] SurroundingAvgGrid;
-        SurroundingAvgGrid = new double[dimX][dimY];
-        grid = getSurroundingSumGrid();
+        double[][] sum = getSurroundingSumGrid(); 
+        double[][] surroundingAvgGrid = new double[dimX][dimY];
 
         for (int i = 0; i < dimX; i++){
             for (int j = 0; j < dimY; j++){
-                double num;
-                num = grid[i][j];
-
-                double DIVISOR;
-                DIVISOR = 4.0;
-                num = num / DIVISOR;
-
-                SurroundingAvgGrid[i][j] = num;
+                surroundingAvgGrid[i][j] = sum[i][j] / 4.0;
             }
         }
-
-        return SurroundingAvgGrid;
+        return surroundingAvgGrid;
     }
 
     @Override
     public double[][] getDeltaGrid() {
-      
-        double[][] deltaGrid;
-        deltaGrid = new double[dimX][dimY];
-        grid = getSurroundingAvgGrid();
+        double[][] avg = getSurroundingAvgGrid();  
+        double[][] deltaGrid = new double[dimX][dimY];
 
         for (int i = 0; i < dimX; i++){
             for (int j = 0; j < dimY; j++){
-                double num;
-                num = grid[i][j];
-
-                double DIVISOR;
-                DIVISOR = 2.0;
-                num = num / DIVISOR;
-
-                deltaGrid[i][j] = Math.abs(num);
+                deltaGrid[i][j] = Math.abs(avg[i][j] / 2.0);
             }
         }
-
         return deltaGrid;
-        
     }
 
     @Override
     public boolean[][] getDangerGrid() {
-        boolean[][] DangerGrid;
-        DangerGrid = new boolean[dimX][dimY];
-
-        grid = getBaseGrid();
+        double[][] base = getBaseGrid();
         double[][] deltaGrid = getDeltaGrid();
         double[][] avggrid = getSurroundingAvgGrid();
-
+        boolean[][] dangerGrid = new boolean[dimX][dimY];
 
         for (int i = 0; i < dimX; i++){
             for (int j = 0; j < dimY; j++){
-                double num;
-                double delta;
-                double avg;
+                double num = base[i][j];
+                double delta = deltaGrid[i][j];
+                double avg = avggrid[i][j];
 
-                num = grid[i][j];
-                delta = deltaGrid[i][j];
-                avg = avggrid[i][j];
-
-                if (((avg + delta) >= num) || ((avg - delta) <= num)) {
-                    DangerGrid[i][j] = false;
+                if (num < (avg - delta) || num > (avg + delta)) {
+                    dangerGrid[i][j] = true;
                 } else {
-                    DangerGrid[i][j] = true;
-                };
-
+                    dangerGrid[i][j] = false;
+                }
             }
         }
-    
-
-
-      return DangerGrid;
-
+        return dangerGrid;
     }
-    
+
+    @Override
+    public String toString() {
+        double[][] base = getBaseGrid();
+        String gridString = "";
+
+        for (int i = 0; i < dimX; i++) {
+            for (int j = 0; j < dimY; j++) {
+                gridString += base[i][j];
+                if (j < dimY - 1) {
+                    gridString += " ";
+                }
+            }
+            gridString += "\n";
+        }
+
+        return gridString;
+    }
 }
